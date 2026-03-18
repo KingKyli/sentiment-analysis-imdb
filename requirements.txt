@@ -1,0 +1,7 @@
+streamlit>=1.43
+scikit-learn==1.7.2
+numpy>=1.26
+matplotlib>=3.8
+tensorflow>=2.18
+deep-translator>=1.11
+langdetect>=1.0.9

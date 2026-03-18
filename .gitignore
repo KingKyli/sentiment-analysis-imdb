@@ -5,3 +5,4 @@ __pycache__/
 .env
 .streamlit/
 model/*.pkl
+!model/sentiment_pipeline.pkl

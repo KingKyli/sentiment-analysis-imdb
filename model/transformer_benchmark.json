@@ -1,0 +1,16 @@
+{
+  "model": "DistilBERT transformer benchmark",
+  "benchmark_type": "pretrained_transformer",
+  "model_family": "transformer",
+  "source_model": "textattack/distilbert-base-uncased-imdb",
+  "accuracy": 0.96,
+  "precision": 0.9298,
+  "recall": 1.0,
+  "f1_score": 0.9636,
+  "training_seconds": null,
+  "inference_ms_per_sample": 188.6365,
+  "evaluation_samples": 100,
+  "supports_predict_proba": true,
+  "deployment_ready": false,
+  "notes": "Inference-only benchmark using a pretrained Hugging Face DistilBERT sentiment model. This is included as a stronger reference, not as the deployed app model."
+}

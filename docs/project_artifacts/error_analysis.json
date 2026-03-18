@@ -1,8 +1,8 @@
 {
   "summary": {
-    "total_errors": 2880,
-    "false_positives": 1433,
-    "false_negatives": 1447,
+    "total_errors": 2906,
+    "false_positives": 1444,
+    "false_negatives": 1462,
     "selection_rule": "Top 10 highest-confidence mistakes on the IMDB test split"
   },
   "examples": [
@@ -11,7 +11,7 @@
       "error_type": "false_positive",
       "true_label": "negative",
       "predicted_label": "positive",
-      "confidence": 0.9924,
+      "confidence": 0.9906,
       "text_preview": "this movie was pure genius john waters is brilliant it is hilarious and i am not sick of it even after seeing it about 20 times since i bought it a few months ago the acting is great although lake could have been better and johnny is magnificent he is such..."
     },
     {
@@ -19,7 +19,7 @@
       "error_type": "false_positive",
       "true_label": "negative",
       "predicted_label": "positive",
-      "confidence": 0.9863,
+      "confidence": 0.9852,
       "text_preview": "this film has the language the style and the attitude down plus rides from a world and the great jerry lopez john as turtle has the surf down and the surfing scenes are still the best ever a true classic that can be seen many times is a babe and hamilton sh..."
     },
     {
@@ -27,7 +27,7 @@
       "error_type": "false_negative",
       "true_label": "positive",
       "predicted_label": "negative",
-      "confidence": 0.9846,
+      "confidence": 0.9834,
       "text_preview": "my sisters and my cousin female forced me to see this chick movie its not the kind of movie i would prefer to see but it really wasn't that bad i wouldn't want to see this movie but after watching it i couldn't say it was bad just not my kind of film it was..."
     },
     {
@@ -35,7 +35,7 @@
       "error_type": "false_positive",
       "true_label": "negative",
       "predicted_label": "positive",
-      "confidence": 0.983,
+      "confidence": 0.9818,
       "text_preview": "mickey rourke diane lane in it is not like mickey rourke ever really disappeared he has had a steady string of appearances before he burst back on the scene he was memorable in domino sin city man on fire once upon a time in mexico and get carter but in his..."
     },
     {
@@ -51,40 +51,40 @@
       "error_type": "false_negative",
       "true_label": "positive",
       "predicted_label": "negative",
-      "confidence": 0.9773,
+      "confidence": 0.9756,
       "text_preview": "when the movie first started i thought cheesy the first ten minutes were really boring after the slow beginning and some of the soap opera antics i started liking it the plot was different than anything i had ever seen now was it a horror not really it shou..."
-    },
-    {
-      "index": 18686,
-      "error_type": "false_positive",
-      "true_label": "negative",
-      "predicted_label": "positive",
-      "confidence": 0.9772,
-      "text_preview": "masterpiece top blows the screen away never has one movie captured the essence of the human spirit quite like of the board 10 10 don't miss this instant classic"
     },
     {
       "index": 4551,
       "error_type": "false_negative",
       "true_label": "positive",
       "predicted_label": "negative",
-      "confidence": 0.9763,
+      "confidence": 0.9754,
       "text_preview": "actually i'll admit i'm a political so this with me but the nature of ms green yes i know what they did to her but the ending was such a and totally inconsistent with the film itself br br why can't barry l and crew just left us wondering what he was going..."
-    },
-    {
-      "index": 23849,
-      "error_type": "false_negative",
-      "true_label": "positive",
-      "predicted_label": "negative",
-      "confidence": 0.9757,
-      "text_preview": "the movie is the real life story of ryan and his girlfriend who cheated on him also with the help from his two friend 1 a who lives for nothing and 2 a trying to be funny scientist which doesn't really work played by and br br the film the movie also has a..."
     },
     {
       "index": 7500,
       "error_type": "false_negative",
       "true_label": "positive",
       "predicted_label": "negative",
-      "confidence": 0.9756,
+      "confidence": 0.9739,
       "text_preview": "right here we go you have probably read in previous reviews on this film that it is awful badly acted avoid at all costs well i suppose in some ways this is true it is fair to say that you couldn't write a spoiler in this comment as there is no plot to spoi..."
+    },
+    {
+      "index": 20824,
+      "error_type": "false_negative",
+      "true_label": "positive",
+      "predicted_label": "negative",
+      "confidence": 0.9738,
+      "text_preview": "david morse and andre are very talented actors which is why i'm trying so hard to support this program unfortunately an irrational plot and very poor writing is making it difficult for me i'm hoping that the show gets a serious or that the actors find new p..."
+    },
+    {
+      "index": 24532,
+      "error_type": "false_negative",
+      "true_label": "positive",
+      "predicted_label": "negative",
+      "confidence": 0.9738,
+      "text_preview": "simon pg 13 thriller about a babysitter who gets disturbing prank calls while sitting at a mansion is neither original nor exciting enough to be called a good film although there are some elements of suspense good eye candy and decent characters the film is..."
     }
   ]
 }

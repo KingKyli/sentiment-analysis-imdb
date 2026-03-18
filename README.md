@@ -6,13 +6,16 @@ This repository upgrades a university ML assignment into a portfolio-ready proje
 - a reproducible project structure
 - an interactive Streamlit demo
 - a deployable sentiment pipeline for raw text input
+- explicit model benchmarking across baseline and stronger linear classifiers
 - multilingual inference support for English and Greek input
 - clear setup and execution instructions
 
 ## Result Snapshot
 
-- Deployable TF-IDF + Logistic Regression pipeline accuracy: `0.8848` on the IMDB test set
-- Precision: `0.8852`, Recall: `0.8842`, F1-score: `0.8847`
+- Deployable TF-IDF + Logistic Regression pipeline accuracy: `0.8838` on the IMDB test set
+- Precision: `0.8843`, Recall: `0.8830`, F1-score: `0.8837`
+- Benchmark comparison artifact is stored in `model/model_comparison.json`
+- Transformer reference benchmark artifact is stored in `model/transformer_benchmark.json`
 - Evaluation artifacts are stored in `model/metrics.json` and `docs/assets/confusion_matrix.png`
 - Error analysis artifact is stored in `docs/project_artifacts/error_analysis.json`
 
@@ -48,10 +51,44 @@ Final deployable model:
 - Test samples: `25,000`
 
 Performance summary:
-- Accuracy: `88.48%`
-- Precision: `88.52%`
-- Recall: `88.42%`
-- F1-score: `88.47%`
+- Accuracy: `88.38%`
+- Precision: `88.43%`
+- Recall: `88.30%`
+- F1-score: `88.37%`
+
+### Model Comparison
+
+The project now includes two layers of benchmark evidence:
+
+1. Full classical benchmark on the held-out IMDB split
+2. Transformer reference benchmark on a smaller CPU-friendly subset for practical portfolio comparison
+
+| Model | Metrics source | Practical role |
+| --- | --- | --- |
+| TF-IDF + Multinomial Naive Bayes | `model/model_comparison.json` | lightweight lexical baseline |
+| TF-IDF + Logistic Regression | `model/model_comparison.json` | strong linear baseline with probability outputs |
+| TF-IDF + Linear SVM | `model/model_comparison.json` | stronger margin-based benchmark |
+| DistilBERT transformer benchmark | `model/transformer_benchmark.json` | stronger modern reference model |
+
+Final-model selection is now explicit rather than implicit:
+- the classical training script compares Naive Bayes, Logistic Regression, and Linear SVM on accuracy, precision, recall, and F1
+- it also records training time and per-sample inference cost
+- it keeps Logistic Regression as the deployed model only when it stays close to the best benchmark while preserving confidence scores for the app
+- if another benchmark wins by a clearly larger F1 margin, the exported deployable pipeline switches automatically
+
+This makes the project easier to defend technically because the final model is chosen after reproducible comparison and documented trade-offs.
+
+Latest benchmark outcome from `model/model_comparison.json`:
+- TF-IDF + Multinomial Naive Bayes: Accuracy `85.59%`, F1 `85.43%`
+- TF-IDF + Logistic Regression: Accuracy `88.38%`, F1 `88.37%`
+- TF-IDF + Linear SVM: Accuracy `86.18%`, F1 `86.03%`
+- DistilBERT transformer benchmark: Accuracy `96.00%`, F1 `96.36%` on `100` held-out reviews, with much higher inference cost
+- Final deployable choice: Logistic Regression, because it remains fast, lightweight, probability-based, and far easier to deploy inside the Streamlit demo
+
+Important comparison note:
+- the transformer benchmark is intentionally marked as a reference benchmark, not the deployed model
+- it was evaluated on a smaller `100`-review subset because this repository is CPU-first and the goal is to show stronger-model awareness without turning the project into a heavyweight serving stack
+- this keeps the project honest: the stronger model is acknowledged, but the final production choice is still justified by deployment trade-offs
 
 Confusion matrix:
 
@@ -93,7 +130,9 @@ The repository combines two layers of work:
 2. Deployable inference pipeline for the demo
 	- IMDB reviews decoded back into raw text
 	- TF-IDF vectorization with unigram and bigram features
-	- Logistic Regression selected as the final deployable model
+	- benchmark comparison across Multinomial Naive Bayes, Logistic Regression, and Linear SVM
+	- DistilBERT added as a stronger transformer reference benchmark
+	- final deployable model selected with an explicit quality-versus-usability rule
 	- serialized pipeline loaded directly by the Streamlit app
 
 ## Project Structure
@@ -147,12 +186,16 @@ The app also displays:
 - prediction confidence
 - class probabilities
 - model summary metrics
+- benchmark comparison across candidate models
+- chart-based comparison of Accuracy and F1
 - detected input language
 - translated model input for non-English reviews
 - embedded confusion matrix and evaluation evidence
 - project framing that makes the demo easier to present
 
 For reproducible evaluation outside the interface, see `model/metrics.json` and `docs/assets/confusion_matrix.png`.
+For reproducible model selection evidence, see `model/model_comparison.json`.
+For the transformer reference benchmark, see `model/transformer_benchmark.json`.
 
 ## Multilingual Input Handling
 
@@ -180,8 +223,19 @@ python scripts/evaluate_model.py
 This produces:
 - `model/sentiment_pipeline.pkl`
 - `model/training_summary.json`
+- `model/model_comparison.json`
 - `model/metrics.json`
 - `docs/assets/confusion_matrix.png`
+
+Optional stronger-reference benchmark:
+
+```bash
+python scripts/benchmark_transformer.py --max-samples 100 --batch-size 8
+```
+
+This additionally produces:
+- `model/transformer_benchmark.json`
+- an updated `model/model_comparison.json` with the transformer entry merged in
 
 1. Open the notebook inside `notebooks/assignment.ipynb`
 2. Run the new export section at the end of the notebook
@@ -195,7 +249,8 @@ The notebook now also contains an evaluation cell that exports:
 
 - classical NLP baselines on IMDB
 - custom implementations of Naive Bayes and Logistic Regression
-- comparison with library-based models
+- reproducible comparison with library-based Naive Bayes, Logistic Regression, and Linear SVM
+- a stronger DistilBERT transformer reference benchmark with explicit deployment trade-off analysis
 - learning curves and evaluation metrics
 - a usable application layer for demonstration purposes
 - conversion of notebook work into a deployable inference pipeline
@@ -251,18 +306,22 @@ Public app URL:
 
 ## Interview-Ready Talking Points
 
-- turned a university assignment into a portfolio-ready ML application
-- selected a deployable text pipeline instead of exposing only notebook experiments
-- balanced academic evaluation with product-style usability
-- added multilingual input handling while keeping the deployed model aligned with its English training distribution
-- packaged the final model so non-technical users can test it directly
+- started from a university assignment and rebuilt it into something that can be used and evaluated outside the notebook
+- benchmarked Naive Bayes, Logistic Regression, and Linear SVM before deciding which pipeline to deploy
+- added a DistilBERT transformer benchmark as a stronger modern reference model
+- kept or switched the final deployable model based on measured F1 trade-offs and app usability constraints
+- kept the project grounded in proper evaluation while also making the demo usable for someone non-technical
+- handled Greek input through translation before inference so the live app stays consistent with an English-trained model
+- packaged the model in a simple Streamlit interface so anyone can test it without setting up the development environment
 
 ## CV Bullets
 
-- Built a production-style sentiment analysis system on the IMDB dataset with multilingual input handling, deployable Streamlit inference, reproducible evaluation artifacts, and documented error analysis.
-- Built an end-to-end IMDB sentiment analysis project using TF-IDF and Logistic Regression, then packaged it into an interactive Streamlit app with Greek-to-English preprocessing, confusion-matrix reporting, and deployment-ready structure.
-- Converted a notebook-based ML assignment into a public-facing portfolio project with GitHub versioning, deployment-ready configuration, and a live demo for non-technical users.
+- Built an IMDB sentiment analysis project end to end, from model training and evaluation to a deployed Streamlit demo.
+- Benchmarked Naive Bayes, Logistic Regression, and Linear SVM, then documented the final model choice with reproducible comparison artifacts.
+- Added a DistilBERT transformer benchmark to compare a stronger modern NLP model against the lightweight deployed pipeline.
+- Added Greek-to-English preprocessing for live inputs and documented performance with metrics, confusion matrix, and error analysis.
+- Turned a notebook-based university assignment into a clean GitHub project with reproducible scripts, deployment-ready structure, and a public demo.
 
 ## Interview Pitch
 
-This project started as an academic sentiment analysis assignment on the IMDB dataset. I extended it into a production-style portfolio project by training a deployable TF-IDF plus Logistic Regression pipeline, packaging it into a Streamlit app, adding multilingual handling for Greek input through translation, and documenting performance with metrics, confusion matrix, and error analysis.
+This project started as a university assignment on sentiment analysis for the IMDB dataset. I wanted to take it beyond the notebook, so I benchmarked Naive Bayes, Logistic Regression, and Linear SVM on a shared held-out split, added a DistilBERT transformer reference benchmark, exported the chosen deployable pipeline, wrapped it in a Streamlit app, added Greek input support through translation, and included evaluation artifacts such as metrics, a confusion matrix, and error analysis. The goal was not just to get a good score, but to present the work in a way that is reproducible, usable, and easy to discuss in a professional setting.

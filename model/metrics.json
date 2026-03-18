@@ -1,35 +1,35 @@
 {
-  "accuracy": 0.8848,
-  "precision": 0.8852,
-  "recall": 0.8842,
-  "f1_score": 0.8847,
+  "accuracy": 0.8838,
+  "precision": 0.8843,
+  "recall": 0.883,
+  "f1_score": 0.8837,
   "support": 25000,
   "model": "TF-IDF + Logistic Regression",
   "dataset": "IMDB",
   "classification_report": {
     "negative": {
-      "precision": 0.8843695061531085,
-      "recall": 0.88536,
-      "f1-score": 0.8848644758934996,
+      "precision": 0.8832081802204825,
+      "recall": 0.88448,
+      "f1-score": 0.8838436325845391,
       "support": 12500.0
     },
     "positive": {
-      "precision": 0.8852314592343424,
-      "recall": 0.88424,
-      "f1-score": 0.8847354518530377,
+      "precision": 0.8843134113122897,
+      "recall": 0.88304,
+      "f1-score": 0.8836762468977664,
       "support": 12500.0
     },
-    "accuracy": 0.8848,
+    "accuracy": 0.88376,
     "macro avg": {
-      "precision": 0.8848004826937255,
-      "recall": 0.8848,
-      "f1-score": 0.8847999638732686,
+      "precision": 0.8837607957663861,
+      "recall": 0.8837600000000001,
+      "f1-score": 0.8837599397411527,
       "support": 25000.0
     },
     "weighted avg": {
-      "precision": 0.8848004826937255,
-      "recall": 0.8848,
-      "f1-score": 0.8847999638732685,
+      "precision": 0.8837607957663861,
+      "recall": 0.88376,
+      "f1-score": 0.8837599397411527,
       "support": 25000.0
     }
   }

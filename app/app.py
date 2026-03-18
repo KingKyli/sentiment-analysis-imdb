@@ -14,17 +14,69 @@ DetectorFactory.seed = 0
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODEL_PATH = PROJECT_ROOT / "model" / "sentiment_pipeline.pkl"
 METRICS_PATH = PROJECT_ROOT / "model" / "metrics.json"
+MODEL_COMPARISON_PATH = PROJECT_ROOT / "model" / "model_comparison.json"
 CONFUSION_MATRIX_PATH = PROJECT_ROOT / "docs" / "assets" / "confusion_matrix.png"
 AUTHOR_LABEL = "Portfolio-ready NLP project"
-AUTHOR_CONTEXT = "Built around deployable sentiment analysis, multilingual inference handling, and reproducible evaluation artifacts."
+AUTHOR_CONTEXT = "Built around model comparison, deployable sentiment analysis, multilingual inference handling, and reproducible evaluation artifacts."
 DEFAULT_METRICS = {
-    "accuracy": 0.8848,
-    "precision": 0.8852,
-    "recall": 0.8842,
-    "f1_score": 0.8847,
+    "accuracy": 0.8838,
+    "precision": 0.8843,
+    "recall": 0.8830,
+    "f1_score": 0.8837,
     "model": "TF-IDF + Logistic Regression",
     "dataset": "IMDB",
     "support": 25000,
+}
+DEFAULT_COMPARISON = {
+    "selected_model": "TF-IDF + Logistic Regression",
+    "selection_reason": "Logistic Regression remains the deployable default because it stays close to the strongest benchmark while keeping probability outputs for the app.",
+    "transformer_reference_reason": "DistilBERT is tracked as a stronger reference benchmark, while the app keeps the lighter classical pipeline unless the project is intentionally upgraded to transformer deployment.",
+    "models": [
+        {
+            "model": "TF-IDF + Multinomial Naive Bayes",
+            "benchmark_type": "trained_in_repo",
+            "accuracy": 0.8559,
+            "precision": 0.8640,
+            "recall": 0.8449,
+            "f1_score": 0.8543,
+            "training_seconds": 13.161,
+            "inference_ms_per_sample": 0.2396,
+            "evaluation_samples": 25000,
+        },
+        {
+            "model": "TF-IDF + Logistic Regression",
+            "benchmark_type": "trained_in_repo",
+            "accuracy": 0.8838,
+            "precision": 0.8843,
+            "recall": 0.8830,
+            "f1_score": 0.8837,
+            "training_seconds": 14.666,
+            "inference_ms_per_sample": 0.2418,
+            "evaluation_samples": 25000,
+        },
+        {
+            "model": "TF-IDF + Linear SVM",
+            "benchmark_type": "trained_in_repo",
+            "accuracy": 0.8618,
+            "precision": 0.8694,
+            "recall": 0.8514,
+            "f1_score": 0.8603,
+            "training_seconds": 18.708,
+            "inference_ms_per_sample": 0.2357,
+            "evaluation_samples": 25000,
+        },
+        {
+            "model": "DistilBERT transformer benchmark",
+            "benchmark_type": "pretrained_transformer",
+            "accuracy": 0.9600,
+            "precision": 0.9298,
+            "recall": 1.0000,
+            "f1_score": 0.9636,
+            "training_seconds": None,
+            "inference_ms_per_sample": 188.6365,
+            "evaluation_samples": 100,
+        },
+    ],
 }
 LANGUAGE_LABELS = {
     "en": "English",
@@ -52,6 +104,14 @@ def load_metrics():
         with METRICS_PATH.open("r", encoding="utf-8") as metrics_file:
             return json.load(metrics_file)
     return DEFAULT_METRICS
+
+
+@st.cache_data
+def load_model_comparison():
+    if MODEL_COMPARISON_PATH.exists():
+        with MODEL_COMPARISON_PATH.open("r", encoding="utf-8") as comparison_file:
+            return json.load(comparison_file)
+    return DEFAULT_COMPARISON
 
 
 def normalize_text(text):
@@ -99,6 +159,25 @@ def prepare_inference_text(raw_text):
 
 def format_metric(value):
     return f"{float(value) * 100:.2f}%"
+
+
+def format_duration(seconds):
+    if seconds is None:
+        return "N/A"
+    return f"{float(seconds):.2f}s"
+
+
+def format_latency(milliseconds):
+    return f"{float(milliseconds):.4f} ms"
+
+
+def build_chart_rows(comparison_data):
+    rows = []
+    for item in comparison_data.get("models", []):
+        model_name = item.get("model", "Unknown")
+        rows.append({"Model": model_name, "Metric": "Accuracy", "Score": round(float(item.get("accuracy", 0.0)), 4)})
+        rows.append({"Model": model_name, "Metric": "F1", "Score": round(float(item.get("f1_score", 0.0)), 4)})
+    return rows
 
 
 def render_metric_card(label, value):
@@ -273,8 +352,9 @@ st.markdown(
             <div class="chip">Interactive Demo</div>
             <div class="chip">IMDB Dataset</div>
             <div class="chip">TF-IDF + Logistic Regression</div>
+            <div class="chip">DistilBERT Benchmark</div>
             <div class="chip">Greek + English Input</div>
-            <div class="chip">88.48% Test Accuracy</div>
+            <div class="chip">88.38% Test Accuracy</div>
         </div>
     </div>
     """,
@@ -290,6 +370,7 @@ if not MODEL_PATH.exists():
 
 pipeline = load_pipeline()
 metrics = load_metrics()
+comparison = load_model_comparison()
 
 left_col, right_col = st.columns([1.45, 0.9], gap="large")
 
@@ -378,7 +459,7 @@ with right_col:
     )
     model_info_col, dataset_info_col = st.columns(2)
     with model_info_col:
-        render_metric_card("Pipeline", "TF-IDF + LR")
+        render_metric_card("Pipeline", metrics.get("model", DEFAULT_METRICS["model"]))
     with dataset_info_col:
         render_metric_card("Dataset", metrics.get("dataset", DEFAULT_METRICS["dataset"]))
 
@@ -486,6 +567,77 @@ with notes_col:
         unsafe_allow_html=True,
     )
 
+st.markdown("### Model Comparison")
+comparison_col, rationale_col = st.columns([1.15, 0.85], gap="large")
+
+with comparison_col:
+    st.markdown(
+        """
+        <div class="panel-card">
+            <div class="section-title">Benchmark table</div>
+            <div class="section-copy">Held-out IMDB comparison across classical baselines and stronger reference models.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    comparison_rows = []
+    for item in comparison.get("models", []):
+        comparison_rows.append(
+            {
+                "Model": item.get("model", "Unknown"),
+                "Type": item.get("benchmark_type", "trained_in_repo"),
+                "Accuracy": format_metric(item.get("accuracy", 0.0)),
+                "Precision": format_metric(item.get("precision", 0.0)),
+                "Recall": format_metric(item.get("recall", 0.0)),
+                "F1": format_metric(item.get("f1_score", 0.0)),
+                "Train": format_duration(item.get("training_seconds")),
+                "Infer / sample": format_latency(item.get("inference_ms_per_sample", 0.0)),
+                "Eval samples": f"{int(item.get('evaluation_samples', 0)):,}",
+            }
+        )
+    st.dataframe(comparison_rows, width="stretch", hide_index=True)
+    st.vega_lite_chart(
+        {"values": build_chart_rows(comparison)},
+        {
+            "mark": {"type": "bar", "cornerRadiusTopLeft": 4, "cornerRadiusTopRight": 4},
+            "encoding": {
+                "x": {"field": "Model", "type": "nominal", "sort": None, "axis": {"labelAngle": -18}},
+                "xOffset": {"field": "Metric"},
+                "y": {"field": "Score", "type": "quantitative", "scale": {"domain": [0.8, 1.0]}},
+                "color": {
+                    "field": "Metric",
+                    "type": "nominal",
+                    "scale": {"range": ["#cb6e17", "#205fa8"]},
+                    "legend": {"orient": "top"}
+                },
+                "tooltip": [
+                    {"field": "Model", "type": "nominal"},
+                    {"field": "Metric", "type": "nominal"},
+                    {"field": "Score", "type": "quantitative", "format": ".4f"}
+                ]
+            },
+            "height": 320,
+        },
+        width="stretch",
+    )
+    st.caption("Accuracy and F1 are plotted together so model quality gaps are visible without reading the full table.")
+
+with rationale_col:
+    st.markdown(
+        """
+        <div class="panel-card">
+            <div class="section-title">Selection rationale</div>
+            <div class="section-copy">Why the demo keeps its current deployable model after benchmarking stronger alternatives.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    render_metric_card("Selected model", comparison.get("selected_model", DEFAULT_COMPARISON["selected_model"]))
+    st.write(comparison.get("selection_reason", DEFAULT_COMPARISON["selection_reason"]))
+    if comparison.get("transformer_reference_reason"):
+        st.write(comparison["transformer_reference_reason"])
+    st.caption("The benchmark is designed to show both model quality and deployment trade-offs, not just the single highest score.")
+
 st.markdown(
     f"""
     <div class="footer-card" style="margin-top: 1.4rem;">
@@ -496,7 +648,7 @@ st.markdown(
         <div class="footer-chip-row">
             <div class="footer-chip">Streamlit demo</div>
             <div class="footer-chip">IMDB dataset</div>
-            <div class="footer-chip">TF-IDF + Logistic Regression</div>
+            <div class="footer-chip">Benchmark: classical + transformer</div>
             <div class="footer-chip">Greek-to-English translation layer</div>
             <div class="footer-chip">Metrics + confusion matrix</div>
         </div>

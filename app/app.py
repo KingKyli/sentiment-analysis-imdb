@@ -5,6 +5,7 @@ from pathlib import Path
 
 from deep_translator import GoogleTranslator
 from langdetect import DetectorFactory, LangDetectException, detect
+import pandas as pd
 import streamlit as st
 
 st.set_page_config(page_title="IMDB Sentiment Demo", layout="wide")
@@ -171,13 +172,20 @@ def format_latency(milliseconds):
     return f"{float(milliseconds):.4f} ms"
 
 
-def build_chart_rows(comparison_data):
+def build_chart_frame(comparison_data):
     rows = []
     for item in comparison_data.get("models", []):
-        model_name = item.get("model", "Unknown")
-        rows.append({"Model": model_name, "Metric": "Accuracy", "Score": round(float(item.get("accuracy", 0.0)), 4)})
-        rows.append({"Model": model_name, "Metric": "F1", "Score": round(float(item.get("f1_score", 0.0)), 4)})
-    return rows
+        rows.append(
+            {
+                "Model": item.get("model", "Unknown"),
+                "Accuracy": round(float(item.get("accuracy", 0.0)), 4),
+                "F1": round(float(item.get("f1_score", 0.0)), 4),
+            }
+        )
+    if not rows:
+        return pd.DataFrame(columns=["Accuracy", "F1"])
+    chart_frame = pd.DataFrame(rows).set_index("Model")
+    return chart_frame[["Accuracy", "F1"]]
 
 
 def render_metric_card(label, value):
@@ -596,28 +604,10 @@ with comparison_col:
             }
         )
     st.dataframe(comparison_rows, width="stretch", hide_index=True)
-    st.vega_lite_chart(
-        {"values": build_chart_rows(comparison)},
-        {
-            "mark": {"type": "bar", "cornerRadiusTopLeft": 4, "cornerRadiusTopRight": 4},
-            "encoding": {
-                "x": {"field": "Model", "type": "nominal", "sort": None, "axis": {"labelAngle": -18}},
-                "xOffset": {"field": "Metric"},
-                "y": {"field": "Score", "type": "quantitative", "scale": {"domain": [0.8, 1.0]}},
-                "color": {
-                    "field": "Metric",
-                    "type": "nominal",
-                    "scale": {"range": ["#cb6e17", "#205fa8"]},
-                    "legend": {"orient": "top"}
-                },
-                "tooltip": [
-                    {"field": "Model", "type": "nominal"},
-                    {"field": "Metric", "type": "nominal"},
-                    {"field": "Score", "type": "quantitative", "format": ".4f"}
-                ]
-            },
-            "height": 320,
-        },
+    st.bar_chart(
+        build_chart_frame(comparison),
+        color=["#cb6e17", "#205fa8"],
+        height=320,
         width="stretch",
     )
     st.caption("Accuracy and F1 are plotted together so model quality gaps are visible without reading the full table.")

@@ -14,6 +14,7 @@ This repository upgrades a university ML assignment into a portfolio-ready proje
 - Deployable TF-IDF + Logistic Regression pipeline accuracy: `0.8848` on the IMDB test set
 - Precision: `0.8852`, Recall: `0.8842`, F1-score: `0.8847`
 - Evaluation artifacts are stored in `model/metrics.json` and `docs/assets/confusion_matrix.png`
+- Error analysis artifact is stored in `docs/project_artifacts/error_analysis.json`
 
 ## App Showcase
 
@@ -56,6 +57,19 @@ Confusion matrix:
 
 ![Confusion Matrix](docs/assets/confusion_matrix.png)
 
+## Error Analysis
+
+Advanced touch added: reproducible error analysis on the highest-confidence mistakes made by the final deployed model.
+
+Artifact:
+- `docs/project_artifacts/error_analysis.json`
+
+Observed failure patterns:
+- strongly positive keywords inside otherwise negative reviews can trigger false positives
+- mixed or contrastive reviews often confuse the classifier, especially when sentiment shifts late in the text
+- reviews that say a film is "not my kind of movie" or start negatively and end positively can produce false negatives
+- short emphatic statements can be misread when the lexical signal is stronger than the actual label
+
 ## Why This Project Stands Out
 
 - moves beyond notebook-only experimentation into a usable product demo
@@ -88,6 +102,7 @@ The repository combines two layers of work:
 sentiment-analysis-imdb/
 ├── .streamlit/
 │   └── config.toml
+├── runtime.txt
 ├── scripts/
 │   ├── train_pipeline.py
 │   └── evaluate_model.py
@@ -101,6 +116,7 @@ sentiment-analysis-imdb/
 │   ├── assets/
 │   └── project_artifacts/
 ├── requirements.txt
+├── requirements-dev.txt
 └── README.md
 ```
 
@@ -182,8 +198,16 @@ The notebook now also contains an evaluation cell that exports:
 
 ## Setup
 
+Runtime app dependencies:
+
 ```bash
 pip install -r requirements.txt
+```
+
+Full local environment for training and evaluation scripts:
+
+```bash
+pip install -r requirements-dev.txt
 ```
 
 ## How To Run
@@ -206,7 +230,9 @@ Recommended deployment target:
 - repository root: `sentiment-analysis-imdb`
 - app entrypoint: `app/app.py`
 - dependencies: `requirements.txt`
+- optional local training extras: `requirements-dev.txt`
 - Streamlit config: `.streamlit/config.toml`
+- Python runtime: `runtime.txt`
 
 Typical deployment flow:
 
@@ -228,4 +254,8 @@ After deployment, replace the local-only demo flow with your public Streamlit UR
 
 ## Summary
 
-Built an end-to-end sentiment analysis project on the IMDB dataset, implementing custom ML models, evaluating them with precision/recall/F1, and packaging the best pipeline into an interactive Streamlit demo for live inference.
+Built a production-style sentiment analysis system on the IMDB dataset with multilingual input handling, deployable Streamlit inference, reproducible evaluation artifacts, and documented error analysis.
+
+Alternative CV bullet:
+
+Built an end-to-end IMDB sentiment analysis project using TF-IDF and Logistic Regression, then packaged it into an interactive Streamlit app with Greek-to-English preprocessing, confusion-matrix reporting, and deployment-ready structure.

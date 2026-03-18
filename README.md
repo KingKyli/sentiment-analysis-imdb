@@ -122,6 +122,10 @@ sentiment-analysis-imdb/
 
 ## Demo
 
+Live demo:
+
+- `https://sentiment-analysis-imdb-kingkyli.streamlit.app`
+
 Run locally:
 
 ```bash
@@ -242,7 +246,8 @@ Typical deployment flow:
 4. Set the main file path to `app/app.py`
 5. Deploy and wait for the build to finish
 
-After deployment, replace the local-only demo flow with your public Streamlit URL in the README and CV.
+Public app URL:
+- `https://sentiment-analysis-imdb-kingkyli.streamlit.app`
 
 ## Interview-Ready Talking Points
 
@@ -252,10 +257,12 @@ After deployment, replace the local-only demo flow with your public Streamlit UR
 - added multilingual input handling while keeping the deployed model aligned with its English training distribution
 - packaged the final model so non-technical users can test it directly
 
-## Summary
+## CV Bullets
 
-Built a production-style sentiment analysis system on the IMDB dataset with multilingual input handling, deployable Streamlit inference, reproducible evaluation artifacts, and documented error analysis.
+- Built a production-style sentiment analysis system on the IMDB dataset with multilingual input handling, deployable Streamlit inference, reproducible evaluation artifacts, and documented error analysis.
+- Built an end-to-end IMDB sentiment analysis project using TF-IDF and Logistic Regression, then packaged it into an interactive Streamlit app with Greek-to-English preprocessing, confusion-matrix reporting, and deployment-ready structure.
+- Converted a notebook-based ML assignment into a public-facing portfolio project with GitHub versioning, deployment-ready configuration, and a live demo for non-technical users.
 
-Alternative CV bullet:
+## Interview Pitch
 
-Built an end-to-end IMDB sentiment analysis project using TF-IDF and Logistic Regression, then packaged it into an interactive Streamlit app with Greek-to-English preprocessing, confusion-matrix reporting, and deployment-ready structure.
+This project started as an academic sentiment analysis assignment on the IMDB dataset. I extended it into a production-style portfolio project by training a deployable TF-IDF plus Logistic Regression pipeline, packaging it into a Streamlit app, adding multilingual handling for Greek input through translation, and documenting performance with metrics, confusion matrix, and error analysis.

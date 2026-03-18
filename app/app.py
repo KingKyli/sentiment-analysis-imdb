@@ -3,6 +3,7 @@ import pickle
 import re
 from pathlib import Path
 
+import altair as alt
 from deep_translator import GoogleTranslator
 from langdetect import DetectorFactory, LangDetectException, detect
 import pandas as pd
@@ -186,6 +187,34 @@ def build_chart_frame(comparison_data):
         return pd.DataFrame(columns=["Accuracy", "F1"])
     chart_frame = pd.DataFrame(rows).set_index("Model")
     return chart_frame[["Accuracy", "F1"]]
+
+
+def build_grouped_chart(comparison_data):
+    chart_frame = build_chart_frame(comparison_data).reset_index()
+    if chart_frame.empty:
+        return None
+
+    chart_data = chart_frame.melt(id_vars="Model", var_name="Metric", value_name="Score")
+    return (
+        alt.Chart(chart_data)
+        .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4)
+        .encode(
+            x=alt.X("Model:N", sort=None, axis=alt.Axis(labelAngle=-30, title=None)),
+            xOffset=alt.XOffset("Metric:N"),
+            y=alt.Y("Score:Q", scale=alt.Scale(domain=[0.8, 1.0])),
+            color=alt.Color(
+                "Metric:N",
+                scale=alt.Scale(range=["#cb6e17", "#205fa8"]),
+                legend=alt.Legend(orient="top"),
+            ),
+            tooltip=[
+                alt.Tooltip("Model:N"),
+                alt.Tooltip("Metric:N"),
+                alt.Tooltip("Score:Q", format=".4f"),
+            ],
+        )
+        .properties(height=320)
+    )
 
 
 def render_metric_card(label, value):
@@ -604,12 +633,9 @@ with comparison_col:
             }
         )
     st.dataframe(comparison_rows, width="stretch", hide_index=True)
-    st.bar_chart(
-        build_chart_frame(comparison),
-        color=["#cb6e17", "#205fa8"],
-        height=320,
-        width="stretch",
-    )
+    comparison_chart = build_grouped_chart(comparison)
+    if comparison_chart is not None:
+        st.altair_chart(comparison_chart, width="stretch")
     st.caption("Accuracy and F1 are plotted together so model quality gaps are visible without reading the full table.")
 
 with rationale_col:

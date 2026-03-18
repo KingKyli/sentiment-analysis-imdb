@@ -226,6 +226,6 @@ After deployment, replace the local-only demo flow with your public Streamlit UR
 - added multilingual input handling while keeping the deployed model aligned with its English training distribution
 - packaged the final model so non-technical users can test it directly
 
-## Suggested CV Bullet
+## Summary
 
 Built an end-to-end sentiment analysis project on the IMDB dataset, implementing custom ML models, evaluating them with precision/recall/F1, and packaging the best pipeline into an interactive Streamlit demo for live inference.

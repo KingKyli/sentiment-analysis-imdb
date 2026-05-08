@@ -304,24 +304,3 @@ Typical deployment flow:
 Public app URL:
 - `https://sentiment-analysis-imdb-kingkyli.streamlit.app`
 
-## Interview-Ready Talking Points
-
-- started from a university assignment and rebuilt it into something that can be used and evaluated outside the notebook
-- benchmarked Naive Bayes, Logistic Regression, and Linear SVM before deciding which pipeline to deploy
-- added a DistilBERT transformer benchmark as a stronger modern reference model
-- kept or switched the final deployable model based on measured F1 trade-offs and app usability constraints
-- kept the project grounded in proper evaluation while also making the demo usable for someone non-technical
-- handled Greek input through translation before inference so the live app stays consistent with an English-trained model
-- packaged the model in a simple Streamlit interface so anyone can test it without setting up the development environment
-
-## CV Bullets
-
-- Built an IMDB sentiment analysis project end to end, from model training and evaluation to a deployed Streamlit demo.
-- Benchmarked Naive Bayes, Logistic Regression, and Linear SVM, then documented the final model choice with reproducible comparison artifacts.
-- Added a DistilBERT transformer benchmark to compare a stronger modern NLP model against the lightweight deployed pipeline.
-- Added Greek-to-English preprocessing for live inputs and documented performance with metrics, confusion matrix, and error analysis.
-- Turned a notebook-based university assignment into a clean GitHub project with reproducible scripts, deployment-ready structure, and a public demo.
-
-## Interview Pitch
-
-This project started as a university assignment on sentiment analysis for the IMDB dataset. I wanted to take it beyond the notebook, so I benchmarked Naive Bayes, Logistic Regression, and Linear SVM on a shared held-out split, added a DistilBERT transformer reference benchmark, exported the chosen deployable pipeline, wrapped it in a Streamlit app, added Greek input support through translation, and included evaluation artifacts such as metrics, a confusion matrix, and error analysis. The goal was not just to get a good score, but to present the work in a way that is reproducible, usable, and easy to discuss in a professional setting.
